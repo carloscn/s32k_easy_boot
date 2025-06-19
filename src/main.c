@@ -35,6 +35,7 @@
 #include "Clock_Ip.h"
 #include "stdint.h"
 #include "S32K312_SCB.h"
+#include <string.h>
 
 #define EASY_BOOT_START_ADDR 		0x00400000U
 #define AppStartAddress 		 	0x00440000U
@@ -87,7 +88,6 @@ void test_led(void)
         test_delay(4800000);
     }
 }
-
 
 void board_level_init(void)
 {
