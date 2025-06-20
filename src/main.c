@@ -44,9 +44,6 @@
 #include "leds_ctrl.h"
 #include "boot.h"
 
-#define BOOT_WEC_MSG ("Hello, this is the bootloader! \r\n")
-#define BOOT_APP_MSG ("Bootloader is booting App...\r\n")
-
 void board_level_init(void)
 {
     // 1. Initialize clock
@@ -67,10 +64,8 @@ int main(void)
 {
 	board_level_init();
 
-	osal_log_info((const char *)BOOT_WEC_MSG);
-	boot_print_app_info();
+	boot_print_board_info();
 	leds_ctrl_boot_led_blink();
-	osal_log_info((const char *)BOOT_APP_MSG);
     boot_app();
 
     return 0;

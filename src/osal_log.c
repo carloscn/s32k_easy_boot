@@ -5,6 +5,10 @@
 
 void osal_log_info(const char *msg)
 {
+	if (NULL == msg || msg[0] == '\0') {
+		return;
+	}
+
     uint32_t bytes_remaining;
     Lpuart_Uart_Ip_AsyncSend(LPUART_INSTANCE, (const uint8_t *)msg, strlen(msg));
     // Poll until transmission completes
