@@ -58,13 +58,11 @@ MEMORY
 }
 
 TARGET(binary)
-INPUT (C:\rom\workspace\S32DS3_5\Hello_World\Debug_FLASH\Hello_World.bin)
+INPUT (..\..\s32k_demo\Debug_FLASH\s32k_demo.bin)
 OUTPUT_FORMAT(default)
-
 
 SECTIONS
 {
-
     .pflash :
     {
         KEEP(*(.boot_header))
@@ -123,7 +121,7 @@ SECTIONS
     {
     	. = ALIGN(4);
     	__int_flash_app_bin_0_start__ = .;
-    	C:\rom\workspace\S32DS3_5\Hello_World\Debug_FLASH\Hello_World.bin (.data)
+    	..\..\s32k_demo\Debug_FLASH\s32k_demo.bin (.data)
     	__int_flash_app_bin_0_end__ = .;
     } > int_flash_app_0
     
