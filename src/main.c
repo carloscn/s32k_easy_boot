@@ -68,6 +68,7 @@ int main(void)
 	board_level_init();
 
 	osal_log_info((const char *)BOOT_WEC_MSG);
+	boot_print_app_info();
 	leds_ctrl_boot_led_blink();
 	osal_log_info((const char *)BOOT_APP_MSG);
     boot_app();

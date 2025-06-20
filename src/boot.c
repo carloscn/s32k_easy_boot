@@ -1,8 +1,12 @@
 #include <stdint.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
 #include "S32K312.h"
 #include "S32K312_SCB.h"
 #include "S32K312_NVIC.h"
 #include "leds_ctrl.h"
+#include "osal_log.h"
 #include "boot.h"
 
 // Global variables (retained to match original)
@@ -24,10 +28,6 @@ static uint8_t boot_validate_app(uint32_t sp)
     return 1;
 }
 
-/**
- * Jumps to the application at AppStartAddress.
- * Disables interrupts, sets up stack and VTOR, and jumps to the reset vector.
- */
 void boot_app(void)
 {
 	uint32_t jump_address = 0;
@@ -67,4 +67,90 @@ void boot_app(void)
     while (1) {
     	leds_ctrl_boot_led_blink_critical_failure(); // Safety loop with failure indication
     }
+}
+
+/**
+ * @brief Get pointer to app metadata structure in flash.
+ * @return Pointer if valid metadata found, NULL otherwise.
+ */
+static const app_metadata_t *get_app_metadata(void)
+{
+    const app_metadata_t *meta = (const app_metadata_t *)APP_METADATA_ADDR;
+    if (meta->magic != APP_METADATA_MAGIC) {
+        return NULL;
+    }
+    return meta;
+}
+
+int32_t boot_read_version(char *version_buffer, size_t buf_size)
+{
+    if (!version_buffer || buf_size == 0)
+        return -1;
+
+    const app_metadata_t *meta = get_app_metadata();
+    if (!meta)
+        return -1;
+
+    strncpy(version_buffer, meta->version, buf_size - 1);
+    version_buffer[buf_size - 1] = '\0';
+    return 0;
+}
+
+int32_t boot_read_app_name(char *name_buffer, size_t buf_size)
+{
+    if (!name_buffer || buf_size == 0)
+        return -1;
+
+    const app_metadata_t *meta = get_app_metadata();
+    if (!meta)
+        return -1;
+
+    strncpy(name_buffer, meta->app_name, buf_size - 1);
+    name_buffer[buf_size - 1] = '\0';
+    return 0;
+}
+
+int32_t boot_print_app_info(void)
+{
+    char version[16] = {0};
+    char app_name[20] = {0};
+
+    const app_metadata_t *meta = get_app_metadata();
+    if (!meta)
+    {
+        osal_log_info((const char *)"Invalid app metadata\r\n");
+        return -1;
+    }
+
+    if (boot_read_version(version, sizeof(version)) != 0)
+        snprintf(version, sizeof(version), "Unknown");
+
+    if (boot_read_app_name(app_name, sizeof(app_name)) != 0)
+        snprintf(app_name, sizeof(app_name), "Unknown");
+
+    char line_buf[64];
+
+    osal_log_info((const char *)"\r\n===== Application Info =====\r\n");
+
+    snprintf(line_buf, sizeof(line_buf), "App Name       : %s\r\n", app_name);
+    osal_log_info((const char *)line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "Version        : %s\r\n", version);
+    osal_log_info((const char *)line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "Build Time     : %lu\r\n", (unsigned long)meta->build_timestamp);
+    osal_log_info((const char *)line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "Flash Start    : 0x%08" PRIX32 "\r\n", meta->flash_start_addr);
+    osal_log_info((const char *)line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "Image Size     : %lu bytes\r\n", (unsigned long)meta->image_size);
+    osal_log_info((const char *)line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "CRC32          : 0x%08" PRIX32 "\r\n", meta->crc32);
+    osal_log_info((const char *)line_buf);
+
+    osal_log_info((const char *)"==============================\r\n");
+
+    return 0;
 }
