@@ -29,79 +29,49 @@
 */
 
 /* Including necessary configuration files. */
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 #include "Mcal.h"
+#include "Clock_Ip.h"
+#include "IntCtrl_Ip.h"
 #include "Siul2_Port_Ip.h"
 #include "Siul2_Dio_Ip.h"
-#include "Clock_Ip.h"
-#include "stdint.h"
-#include "S32K312_SCB.h"
-#include <string.h>
+#include "Lpuart_Uart_Ip.h"
+#include "Lpuart_Uart_Ip_Irq.h"
+#include "osal_log.h"
+#include "osal_utils.h"
+#include "leds_ctrl.h"
+#include "boot.h"
 
-#define EASY_BOOT_START_ADDR 		0x00400000U
-#define AppStartAddress 		 	0x00440000U
-
-static void (*JumpTpApplication)(void) = NULL;
-static uint32_t stack_point;
-volatile int exit_code = 0;
-/* User includes */
-
-/*!
-  \brief The main function for the project.
-  \details The startup initialization sequence is the following:
- * - startup asm routine
- * - main()
-*/
-
-void boot_app(void)
-{
-	__asm("cpsid i");
-	uint32_t JumpAddress = 0;
-
-	stack_point = *(volatile uint32_t *)(AppStartAddress+0x0c);
-	JumpAddress = *(volatile uint32_t *)(stack_point+0x04);
-	JumpTpApplication = (void (*)(void))JumpAddress;
-	S32_SCB->VTOR = *(volatile uint32_t *)(AppStartAddress+0x0c);
-	__asm volatile("MSR msp, %0\n":: "r" (stack_point));
-	__asm volatile("MSR psp, %0\n":: "r" (stack_point));
-	JumpTpApplication();
-}
-
-// Simple delay function
-void test_delay(uint32_t delay)
-{
-    static volatile uint32_t delay_timer = 0;
-    while (delay_timer < delay) {
-        delay_timer++;
-    }
-    delay_timer = 0;
-}
-
-// LED blinking function
-void test_led(void)
-{
-    uint8_t count = 0;
-
-    while (count++ < 5) {
-        Siul2_Dio_Ip_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, 1U);
-        test_delay(4800000);
-        Siul2_Dio_Ip_WritePin(LED_BLUE_PORT, LED_BLUE_PIN, 0U);
-        test_delay(4800000);
-    }
-}
+#define BOOT_WEC_MSG ("Hello, this is the bootloader! \r\n")
+#define BOOT_APP_MSG ("Bootloader is booting App...\r\n")
 
 void board_level_init(void)
 {
+    // 1. Initialize clock
     Clock_Ip_Init(&Clock_Ip_aClockConfig[0]);
+
+    // 2. Initialize ports
     Siul2_Port_Ip_Init(NUM_OF_CONFIGURED_PINS_PortContainer_0_BOARD_InitPeripherals,
                        g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals);
+
+    // 3. Initialize interrupt controller
+    IntCtrl_Ip_Init(&IntCtrlConfig_0);
+
+    // 4. Initialize LPUART6
+    Lpuart_Uart_Ip_Init(LPUART_INSTANCE, &Lpuart_Uart_Ip_xHwConfigPB_6);
 }
 
 int main(void)
 {
-    /* Write your code here */
 	board_level_init();
-    test_led();
+
+	osal_log_info((const char *)BOOT_WEC_MSG);
+	leds_ctrl_boot_led_blink();
+	osal_log_info((const char *)BOOT_APP_MSG);
     boot_app();
+
     return 0;
 }
 
