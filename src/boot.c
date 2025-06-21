@@ -10,8 +10,7 @@
 #include "leds_ctrl.h"
 #include "osal_log.h"
 #include "boot.h"
-
-#define EASY_BOOT_VERSION "v2025.06"
+#include "boot_version.h"
 
 // Board information structure
 typedef struct {
@@ -30,6 +29,7 @@ typedef struct {
     const char *serial_out;        // Output serial port (e.g., "serial@LPUART6")
     const char *serial_err;        // Error serial port (e.g., "serial@LPUART6")
     const char *network;           // Network interface (e.g., "None")
+    const char *hse;
     uint32_t load_address;         // Load address (e.g., 0x80007FC0)
     uint32_t entry_point;          // Entry point (e.g., 0x80007FC0)
     uint32_t app_address;          // App address (e.g., 0x83000000)
@@ -40,9 +40,9 @@ typedef struct {
 static const board_info_t board_info = {
     .boot_version = EASY_BOOT_VERSION,
     .build_time = "Jun 20 2025 - 21:32:00 +0800",
-    .cpu_model = "ARM Cortex-M7, 120 MHz (Single Core)",
+    .cpu_model = "ARM Cortex-M7 @120MHz (Single Core)",
     .model = "S32K312",
-    .board_id = "S32K312_RevA_1234ABCD", // Replace with dynamic chip_id if needed
+    .board_id = "401FC271",              // Replace with dynamic chip_id if needed
     .dram_size = "192 KiB",              // Total SRAM (ITCM + DTCM + SRAM)
     .pflash_size = "1920 KiB",           // Code Flash (pflash + app_0)
     .dflash_size = "128 KiB",            // Data Flash
@@ -50,6 +50,7 @@ static const board_info_t board_info = {
     .serial_out = "serial@LPUART6",
     .serial_err = "serial@LPUART6",
     .network = "None",
+	.hse = "Disabled",
     .load_address = EASY_BOOT_START_ADDR,
     .entry_point = EASY_BOOT_START_ADDR,
     .app_address = APP_START_ADDRESS,
@@ -193,15 +194,7 @@ int32_t boot_print_board_info(void)
     char chip_id[9] = {0};
     char build_time_str[32];
 
-    time_t raw_time;
-    time(&raw_time);
-    // Format build timestamp to U-Boot style (e.g., "Jun 20 2025 - 08:20:00")
-    struct tm *tm_info = localtime(&raw_time);
-    if (tm_info) {
-        strftime(build_time_str, sizeof(build_time_str), "%b %d %Y - %H:%M:%S", tm_info);
-    } else {
-        snprintf(build_time_str, sizeof(build_time_str), "%s", board_info.build_time);
-    }
+    snprintf(build_time_str, sizeof(build_time_str), "%s - %s", __DATE__, __TIME__);
 
     if (boot_read_device_id(chip_id, sizeof(chip_id)) != 0) {
         snprintf(chip_id, sizeof(chip_id), "Unknown");
@@ -245,6 +238,9 @@ int32_t boot_print_board_info(void)
     snprintf(line_buf, sizeof(line_buf), "Net:   %s\r\n", board_info.network);
     osal_log_info(line_buf);
 
+    snprintf(line_buf, sizeof(line_buf), "HSE:   %s\r\n", board_info.hse);
+    osal_log_info(line_buf);
+
     // === Application Information ===
     osal_log_info("## Loading App from pflash...\r\n");
 
@@ -267,6 +263,8 @@ int32_t boot_print_board_info(void)
     snprintf(line_buf, sizeof(line_buf), "## Booting App from pflash at 0x%08lX ...\r\n", board_info.app_address);
     osal_log_info(line_buf);
     snprintf(line_buf, sizeof(line_buf), "   App Name:    %s\r\n", app_name);
+    osal_log_info(line_buf);
+    snprintf(line_buf, sizeof(line_buf), "   Built Time:  %s\r\n", meta->build_timestamp);
     osal_log_info(line_buf);
     snprintf(line_buf, sizeof(line_buf), "   App Type:    Raw Binary\r\n");
     osal_log_info(line_buf);

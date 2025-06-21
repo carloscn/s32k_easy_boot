@@ -196,7 +196,7 @@
                   <clock_output id="FLEXCAN5_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
                   <clock_output id="FLEXCANA_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
                   <clock_output id="FLEXCANB_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
-                  <clock_output id="FLEXIO0_CLK.outFreq" value="60 MHz" locked="false" accuracy=""/>
+                  <clock_output id="FLEXIO0_CLK.outFreq" value="120 MHz" locked="false" accuracy=""/>
                   <clock_output id="FXOSCOUT.outFreq" value="16 MHz" locked="false" accuracy=""/>
                   <clock_output id="HSE_CLK.outFreq" value="60 MHz" locked="false" accuracy=""/>
                   <clock_output id="INTM_CLK.outFreq" value="60 MHz" locked="false" accuracy=""/>
@@ -355,13 +355,59 @@
                   <data type="Version">1.0.0</data>
                </feature>
             </dependency>
-            <dependency resourceType="Tool" resourceId="Clocks" description="外围设备工具需要 Clocks 工具，但它已被禁用。" problem_level="2" source="Peripherals">
+            <dependency resourceType="SWComponent" resourceId="platform.driver.cache" description="工具链/IDE工程中未找到cache。工程不会被编译！" problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
-                  <data>true</data>
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.cache" description="工具链/IDE工程不支持cache版本。所需值: ${required_value}, 实际值: ${actual_value}. 工程可能没有被正确编译。" problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.c40_ip" description="工具链/IDE工程中未找到C40_Ip。工程不会被编译！" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.c40_ip" description="工具链/IDE工程不支持C40_Ip版本。所需值: ${required_value}, 实际值: ${actual_value}. 工程可能没有被正确编译。" problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.crc_ip" description="工具链/IDE工程中未找到crc_ip。工程不会被编译！" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.crc_ip" description="工具链/IDE工程不支持crc_ip版本。所需值: ${required_value}, 实际值: ${actual_value}. 工程可能没有被正确编译。" problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.dma" description="工具链/IDE工程中未找到dma。工程不会被编译！" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.driver.dma" description="工具链/IDE工程不支持dma版本。所需值: ${required_value}, 实际值: ${actual_value}. 工程可能没有被正确编译。" problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">1.0.0</data>
                </feature>
             </dependency>
          </dependencies>
          <generated_project_files>
+            <file path="generate/include/C40_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Cache_Ip_Cfg_Defines.h" update_enabled="true"/>
+            <file path="generate/include/Cache_Ip_Cfg_DeviceRegisters.h" update_enabled="true"/>
+            <file path="generate/include/Crc_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Crc_Ip_CfgDefines.h" update_enabled="true"/>
+            <file path="generate/include/DeviceDefinition.h" update_enabled="true"/>
+            <file path="generate/include/Dma_Ip_Cfg.h" update_enabled="true"/>
+            <file path="generate/include/Dma_Ip_Cfg_Defines.h" update_enabled="true"/>
+            <file path="generate/include/Dma_Ip_Cfg_DeviceRegistersV3.h" update_enabled="true"/>
+            <file path="generate/include/Dma_Ip_Cfg_Devices.h" update_enabled="true"/>
+            <file path="generate/include/Dma_Ip_PBcfg.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_Cfg.h" update_enabled="true"/>
             <file path="generate/include/IntCtrl_Ip_CfgDefines.h" update_enabled="true"/>
             <file path="generate/include/Lpuart_Uart_Ip_Cfg.h" update_enabled="true"/>
@@ -373,6 +419,10 @@
             <file path="generate/include/Siul2_Port_Ip_Defines.h" update_enabled="true"/>
             <file path="generate/include/Soc_Ips.h" update_enabled="true"/>
             <file path="generate/include/modules.h" update_enabled="true"/>
+            <file path="generate/src/C40_Ip_Cfg.c" update_enabled="true"/>
+            <file path="generate/src/Crc_Ip_Cfg.c" update_enabled="true"/>
+            <file path="generate/src/Dma_Ip_Cfg.c" update_enabled="true"/>
+            <file path="generate/src/Dma_Ip_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/IntCtrl_Ip_Cfg.c" update_enabled="true"/>
             <file path="generate/src/Lpuart_Uart_Ip_Sa_PBcfg.c" update_enabled="true"/>
             <file path="generate/src/OsIf_Cfg.c" update_enabled="true"/>
@@ -400,7 +450,9 @@
                            <setting name="OsIfDevErrorDetect" value="true"/>
                            <setting name="OsIfUseSystemTimer" value="false"/>
                            <setting name="OsIfUseCustomTimer" value="false"/>
+                           <setting name="OsIfUseGetUserId" value="GET_CORE_ID"/>
                            <setting name="OsIfInstanceId" value="255"/>
+                           <setting name="OsIfGetPhysicalCoreIdEnable" value="false"/>
                            <struct name="OsIfOperatingSystemType">
                               <setting name="Name" value="OsIfOperatingSystemType"/>
                               <setting name="Choice" value="OsIfBaremetalType"/>
@@ -551,6 +603,282 @@
                               </array>
                            </struct>
                         </array>
+                     </config_set>
+                  </instance>
+                  <instance name="Cache_Ip" uuid="76056feb-da52-40c9-b6c0-6bc4fde100a1" type="Cache_Ip" type_id="Cache_Ip" mode="general" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Cache_Ip">
+                        <setting name="Name" value="Cache"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-POST-BUILD"/>
+                        </struct>
+                        <struct name="MclGeneral">
+                           <setting name="Name" value="MclGeneral"/>
+                           <setting name="MclEnableUserModeSupport" value="false"/>
+                           <struct name="MclCache">
+                              <setting name="Name" value="MclCache"/>
+                              <setting name="MclEnableCache" value="false"/>
+                              <setting name="MclEnableCacheDevErrorDetect" value="false"/>
+                           </struct>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="C40_Ip" uuid="a16d5c02-63cb-493e-bbf7-d37761750ca4" type="C40_Ip" type_id="C40_Ip" mode="ip" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="C40_Ip">
+                        <setting name="Name" value="C40_Ip"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-PRE-COMPILE"/>
+                        </struct>
+                        <struct name="MemGeneral">
+                           <setting name="Name" value="MemGeneral"/>
+                           <setting name="C40IpDevErrorDetect" value="false"/>
+                           <setting name="MemHwCompareService" value="false"/>
+                           <setting name="MemEnableCheckCfgCrc" value="false"/>
+                           <setting name="MemHwUtestModeService" value="false"/>
+                           <setting name="MemSectorSetLockApi" value="false"/>
+                           <setting name="MemEraseVerificationEnabled" value="false"/>
+                           <setting name="MemWriteVerificationEnabled" value="false"/>
+                           <array name="MemStartFlashAccessNotif"/>
+                           <array name="MemFinishedFlashAccessNotif"/>
+                           <setting name="MemTimeoutSupervisionEnabled" value="false"/>
+                           <setting name="MemTimeoutMethod" value="OSIF_COUNTER_DUMMY"/>
+                           <setting name="MemEraseTimeout" value="0"/>
+                           <setting name="MemWriteTimeout" value="0"/>
+                           <setting name="MemAbortTimeout" value="0"/>
+                           <setting name="MemUtestSuspendTimeout" value="0"/>
+                           <setting name="MemUtestResumeTimeout" value="0"/>
+                        </struct>
+                        <struct name="MemAutosarExt">
+                           <setting name="Name" value="MemAutosarExt"/>
+                           <setting name="MemEnableUserModeSupport" value="false"/>
+                           <setting name="MemSynchronizeCache" value="false"/>
+                           <setting name="MemEccDataErrorSuppression" value="false"/>
+                           <setting name="MemBlock4PipeSelect" value="MEM_COMMAND_PIPE_0"/>
+                           <setting name="MemUsesAlterInterface" value="false"/>
+                        </struct>
+                        <struct name="MemPublishedInformation">
+                           <setting name="Name" value="MemPublishedInformation"/>
+                           <setting name="MemErasedValue" value="4294967295"/>
+                           <setting name="MemECCValue" value="1427461397"/>
+                        </struct>
+                        <struct name="CommonPublishedInformation">
+                           <setting name="Name" value="CommonPublishedInformation"/>
+                           <setting name="ArReleaseMajorVersion" value="4"/>
+                           <setting name="ArReleaseMinorVersion" value="7"/>
+                           <setting name="ArReleaseRevisionVersion" value="0"/>
+                           <setting name="ModuleId" value="91"/>
+                           <setting name="SwMajorVersion" value="5"/>
+                           <setting name="SwMinorVersion" value="0"/>
+                           <setting name="SwPatchVersion" value="0"/>
+                           <setting name="VendorApiInfix" value="INFLS"/>
+                           <setting name="VendorId" value="43"/>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="Crc_Ip" uuid="9ca50c5c-c188-42ea-8650-59a6fdb7ab41" type="Crc_Ip" type_id="Crc_Ip" mode="IP" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Crc_Ip">
+                        <setting name="Name" value="Crc_Ip"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-PRE-COMPILE"/>
+                        </struct>
+                        <struct name="CrcGeneral">
+                           <setting name="Name" value="CrcGeneral"/>
+                           <setting name="CrcDetectError" value="true"/>
+                           <setting name="CrcEnableUserModeSupport" value="false"/>
+                           <setting name="CrcDmaSupportEnable" value="true"/>
+                        </struct>
+                        <array name="CrcChannelConfig">
+                           <struct name="0">
+                              <setting name="Name" value="CrcChannelsConfig_0"/>
+                              <setting name="CrcLogicChannelName" value="CRC_LOGIC_CHANNEL_0"/>
+                              <setting name="CrcCalculationType" value="CRC_IP_TABLE_CALCULATION"/>
+                              <struct name="CrcHardwareConfig">
+                                 <setting name="Name" value="CrcHardwareConfig"/>
+                                 <setting name="CrcHwInstance" value="CRC_HW_INSTANCE_0"/>
+                                 <setting name="CrcHwChannel" value="CRC_HW_CHANNEL_0"/>
+                                 <setting name="CrcDmaChannelEnable" value="false"/>
+                                 <array name="CrcDmaLogicChannelName"/>
+                                 <setting name="CrcDmaTransferSize" value="CRC_DMA_TRANSFER_SIZE_1_BYTE"/>
+                              </struct>
+                              <struct name="CrcProtocolInfo">
+                                 <setting name="Name" value="CrcProtocolInfo"/>
+                                 <setting name="CrcProtocolType" value="CRC_PROTOCOL_16BIT_CCITT_FALSE"/>
+                                 <setting name="CrcPolynomialValue" value="0X1021"/>
+                                 <setting name="CrcWriteBitSwap" value="false"/>
+                                 <setting name="CrcWriteByteSwap" value="false"/>
+                                 <setting name="CrcReadBitSwap" value="false"/>
+                                 <setting name="CrcReadByteSwap" value="false"/>
+                                 <setting name="CrcInversionEnable" value="false"/>
+                              </struct>
+                           </struct>
+                           <struct name="1">
+                              <setting name="Name" value="CrcChannelsConfig_1"/>
+                              <setting name="CrcLogicChannelName" value="CRC_LOGIC_CHANNEL_1"/>
+                              <setting name="CrcCalculationType" value="CRC_IP_RUNTIME_CALCULATION"/>
+                              <struct name="CrcHardwareConfig">
+                                 <setting name="Name" value="CrcHardwareConfig"/>
+                                 <setting name="CrcHwInstance" value="CRC_HW_INSTANCE_0"/>
+                                 <setting name="CrcHwChannel" value="CRC_HW_CHANNEL_0"/>
+                                 <setting name="CrcDmaChannelEnable" value="false"/>
+                                 <array name="CrcDmaLogicChannelName"/>
+                                 <setting name="CrcDmaTransferSize" value="CRC_DMA_TRANSFER_SIZE_1_BYTE"/>
+                              </struct>
+                              <struct name="CrcProtocolInfo">
+                                 <setting name="Name" value="CrcProtocolInfo"/>
+                                 <setting name="CrcProtocolType" value="CRC_PROTOCOL_32BIT_ETHERNET"/>
+                                 <setting name="CrcPolynomialValue" value="0X4C11DB7"/>
+                                 <setting name="CrcWriteBitSwap" value="true"/>
+                                 <setting name="CrcWriteByteSwap" value="false"/>
+                                 <setting name="CrcReadBitSwap" value="true"/>
+                                 <setting name="CrcReadByteSwap" value="true"/>
+                                 <setting name="CrcInversionEnable" value="true"/>
+                              </struct>
+                           </struct>
+                           <struct name="2">
+                              <setting name="Name" value="CrcChannelsConfig_2"/>
+                              <setting name="CrcLogicChannelName" value="CRC_LOGIC_CHANNEL_2"/>
+                              <setting name="CrcCalculationType" value="CRC_IP_HARDWARE_CALCULATION"/>
+                              <struct name="CrcHardwareConfig">
+                                 <setting name="Name" value="CrcHardwareConfig"/>
+                                 <setting name="CrcHwInstance" value="CRC_HW_INSTANCE_0"/>
+                                 <setting name="CrcHwChannel" value="CRC_HW_CHANNEL_0"/>
+                                 <setting name="CrcDmaChannelEnable" value="true"/>
+                                 <array name="CrcDmaLogicChannelName">
+                                    <setting name="0" value="/Dma_Ip/Dma/MclConfig/dmaLogicChannel_Type_0"/>
+                                 </array>
+                                 <setting name="CrcDmaTransferSize" value="CRC_DMA_TRANSFER_SIZE_1_BYTE"/>
+                              </struct>
+                              <struct name="CrcProtocolInfo">
+                                 <setting name="Name" value="CrcProtocolInfo"/>
+                                 <setting name="CrcProtocolType" value="CRC_PROTOCOL_32BIT_ETHERNET"/>
+                                 <setting name="CrcPolynomialValue" value="0X4C11DB7"/>
+                                 <setting name="CrcWriteBitSwap" value="true"/>
+                                 <setting name="CrcWriteByteSwap" value="false"/>
+                                 <setting name="CrcReadBitSwap" value="true"/>
+                                 <setting name="CrcReadByteSwap" value="true"/>
+                                 <setting name="CrcInversionEnable" value="true"/>
+                              </struct>
+                           </struct>
+                        </array>
+                     </config_set>
+                  </instance>
+                  <instance name="Dma_Ip" uuid="b42d07e2-b4c7-4f9a-9e60-6c7386edc880" type="Dma_Ip" type_id="Dma_Ip" mode="general" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="Dma_Ip">
+                        <setting name="Name" value="Dma"/>
+                        <struct name="ConfigTimeSupport">
+                           <setting name="POST_BUILD_VARIANT_USED" value="false"/>
+                           <setting name="IMPLEMENTATION_CONFIG_VARIANT" value="VARIANT-POST-BUILD"/>
+                        </struct>
+                        <struct name="MclGeneral">
+                           <setting name="Name" value="MclGeneral"/>
+                           <setting name="MclEnableUserModeSupport" value="false"/>
+                           <struct name="MclDma">
+                              <setting name="Name" value="MclDma"/>
+                              <setting name="MclEnableDma" value="true"/>
+                              <setting name="MclEnableDmaDevErrorDetect" value="false"/>
+                           </struct>
+                        </struct>
+                        <struct name="MclConfig">
+                           <setting name="Name" value="MclConfig"/>
+                           <array name="dmaLogicInstance_ConfigType">
+                              <struct name="0">
+                                 <setting name="Name" value="dmaLogicInstance_ConfigType_0"/>
+                                 <setting name="dmaLogicInstance_IdName" value="DMA_LOGIC_INST_0"/>
+                                 <setting name="dmaLogicInstance_hwId" value="DMA_IP_HW_INST_0"/>
+                                 <setting name="dmaLogicInstance_enDebug" value="false"/>
+                                 <setting name="dmaLogicInstance_enRoundRobin" value="false"/>
+                                 <setting name="dmaLogicInstance_enHaltAfterError" value="false"/>
+                                 <setting name="dmaLogicInstance_enChLinking" value="false"/>
+                                 <setting name="dmaLogicInstance_enGlMasterIdReplication" value="false"/>
+                              </struct>
+                           </array>
+                           <array name="dmaLogicChannel_Type">
+                              <struct name="0">
+                                 <setting name="Name" value="dmaLogicChannel_Type_0"/>
+                                 <setting name="dmaLogicChannel_LogicName" value="DMA_LOGIC_CH_0"/>
+                                 <setting name="dmaLogicChannel_HwInstId" value="DMA_IP_HW_INST_0"/>
+                                 <setting name="dmaLogicChannel_HwChId" value="DMA_IP_HW_CH_0"/>
+                                 <setting name="dmaLogicChannel_InterruptCallback" value="NULL_PTR"/>
+                                 <setting name="dmaLogicChannel_ErrorInterruptCallback" value="NULL_PTR"/>
+                                 <setting name="dmaLogicChannel_EnableGlobalConfig" value="false"/>
+                                 <setting name="dmaLogicChannel_EnableTransferConfig" value="false"/>
+                                 <setting name="dmaLogicChannel_EnableScatterGather" value="false"/>
+                                 <struct name="dmaLogicChannel_ConfigType">
+                                    <setting name="Name" value="dmaLogicChannel_ConfigType"/>
+                                    <struct name="dmaLogicChannel_GlobalConfigType">
+                                       <setting name="Name" value="dmaLogicChannel_GlobalConfigType"/>
+                                       <struct name="dmaLogicChannelConfig_GlobalControlType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_GlobalControlType"/>
+                                          <setting name="dmaGlobalControl_enMasterIdReplication" value="false"/>
+                                          <setting name="dmaGlobalControl_enBufferedWrites" value="false"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_GlobalRequestType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_GlobalRequestType"/>
+                                          <setting name="dmaGlobalRequest_enDmaRequest" value="false"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_GlobalInterruptType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_GlobalInterruptType"/>
+                                          <setting name="dmaGlobalInterrupt_enDmaErrorInterrupt" value="false"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_GlobalPriorityType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_GlobalPriorityType"/>
+                                          <setting name="dmaGlobalPriority_GroupPriority" value="DMA_IP_GROUP_PRIO0"/>
+                                          <setting name="dmaGlobalPriority_LevelPriority" value="DMA_IP_LEVEL_PRIO0"/>
+                                          <setting name="dmaGlobalPriority_enPreemption" value="false"/>
+                                          <setting name="dmaGlobalPriority_disPreempt" value="false"/>
+                                       </struct>
+                                    </struct>
+                                    <struct name="dmaLogicChannel_TransferConfigType">
+                                       <setting name="Name" value="dmaLogicChannel_TransferConfigType"/>
+                                       <struct name="dmaLogicChannelConfig_TransferControlType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_TransferControlType"/>
+                                          <setting name="dmaLogicChannelConfig_enDmaMajorInterrupt" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_enDmaHalfMajorInterrupt" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_disDmaAutoHwReq" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_enEndOfPacketSignal" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_bandwidthControl" value="DMA_IP_BWC_ENGINE_NO_STALL"/>
+                                          <setting name="dmaLogicChannelConfig_DestinationStoreAddressType" value=""/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_TransferSourceType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_TransferSourceType"/>
+                                          <setting name="dmaLogicChannelConfig_SourceSignedOffsetType" value="0"/>
+                                          <setting name="dmaLogicChannelConfig_SourceLastAddressAdjustmentType" value="0"/>
+                                          <setting name="dmaTransferConfig_TransferSizeType" value="DMA_IP_TRANSFER_SIZE_1_BYTE"/>
+                                          <setting name="dmaLogicChannelConfig_SourceModuloType" value="0"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_TransferDestinationType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_TransferDestinationType"/>
+                                          <setting name="dmaLogicChannelConfig_DestinationSignedOffsetType" value="0"/>
+                                          <setting name="dmaLogicChannelConfig_DestinationLastAddressAdjustmentType" value="0"/>
+                                          <setting name="dmaTransferConfig_TransferSizeType" value="DMA_IP_TRANSFER_SIZE_1_BYTE"/>
+                                          <setting name="dmaLogicChannelConfig_DestinationModuloType" value="0"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_TransferMinorLoopType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_TransferMinorLoopType"/>
+                                          <setting name="dmaLogicChannelConfig_enSourceOffset" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_enDestinationOffset" value="false"/>
+                                          <setting name="dmaLogicChannelConfig_OffsetValueType" value="0"/>
+                                          <setting name="dmaLogicChannelConfig_enMinorLoopLinkCh" value="false"/>
+                                          <setting name="dynamic_dmaLogicChannelConfig_MinorLoopLinkChValueType" value="/Dma_Ip/Dma/MclConfig/dmaLogicChannel_Type_0"/>
+                                          <setting name="dmaLogicChannelConfig_MinorLoopSizeType" value="0"/>
+                                       </struct>
+                                       <struct name="dmaLogicChannelConfig_TransferMajorLoopType">
+                                          <setting name="Name" value="dmaLogicChannelConfig_TransferMajorLoopType"/>
+                                          <setting name="dmaLogicChannelConfig_enMajorLoopLinkCh" value="false"/>
+                                          <setting name="dynamic_dmaLogicChannelConfig_MajorLoopLinkChValueType" value="/Dma_Ip/Dma/MclConfig/dmaLogicChannel_Type_0"/>
+                                          <setting name="dmaLogicChannelConfig_MajorLoopCountType" value="0"/>
+                                       </struct>
+                                    </struct>
+                                    <struct name="dmaLogicChannel_ScatterGatherConfigType">
+                                       <setting name="Name" value="dmaLogicChannel_ScatterGatherConfigType"/>
+                                       <array name="dmaLogicChannelConfig_ScatterGatherArrayType"/>
+                                    </struct>
+                                 </struct>
+                              </struct>
+                           </array>
+                        </struct>
                      </config_set>
                   </instance>
                </instances>

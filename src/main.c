@@ -49,6 +49,12 @@ void board_level_init(void)
     // 1. Initialize clock
     Clock_Ip_Init(&Clock_Ip_aClockConfig[0]);
 
+    Clock_Ip_InitClock(Clock_Ip_aClockConfig);
+
+    while (CLOCK_IP_PLL_LOCKED != Clock_Ip_GetPllStatus()) { /* Busy wait */ }
+
+    Clock_Ip_DistributePll();
+
     // 2. Initialize ports
     Siul2_Port_Ip_Init(NUM_OF_CONFIGURED_PINS_PortContainer_0_BOARD_InitPeripherals,
                        g_pin_mux_InitConfigArr_PortContainer_0_BOARD_InitPeripherals);

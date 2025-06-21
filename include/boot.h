@@ -14,12 +14,11 @@ typedef struct
     uint32_t magic;                         // 0x00: Identifier
     char     app_name[APP_NAME_MAX_LEN];    // 0x04: Null-terminated app name
     char     version[APP_VERSION_MAX_LEN];  // 0x14: Null-terminated version
-    uint32_t build_timestamp;               // 0x20: UNIX time (seconds since epoch)
-    uint32_t flash_start_addr;              // 0x24: App binary flash base address
-    uint32_t image_size;                    // 0x28: Size in bytes for CRC coverage
-    uint32_t crc32;                         // 0x2C: CRC32 over image (excluding metadata)
+    char    *build_timestamp;               // 0x24: Null-terminated build date and time string
+    uint32_t flash_start_addr;              // 0x28: App binary flash base address
+    uint32_t image_size;                    // 0x2C: Size in bytes for CRC coverage
+    uint32_t crc32;                         // 0x30: CRC32 over image (excluding metadata)
 } app_metadata_t;
-
 /**
  * @brief Read the app version string from metadata.
  * @param[out] version_buffer Buffer to store the version string.
