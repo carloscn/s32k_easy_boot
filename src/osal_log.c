@@ -1,21 +1,12 @@
 #include "osal_log.h"
-#include "Lpuart_Uart_Ip.h"
-#include "Lpuart_Uart_Ip_Irq.h"
+#include "hal_uart.h"
 #include <string.h>
 
+extern HAL_UART lpuart6;
 void osal_log_info(const char *msg)
 {
 	if (NULL == msg || msg[0] == '\0') {
 		return;
 	}
-
-    uint32_t bytes_remaining;
-    Lpuart_Uart_Ip_AsyncSend(LPUART_INSTANCE, (const uint8_t *)msg, strlen(msg));
-    // Poll until transmission completes
-    while (Lpuart_Uart_Ip_GetTransmitStatus(LPUART_INSTANCE, &bytes_remaining) == LPUART_UART_IP_STATUS_BUSY) {
-        ; // Wait for completion
-    }
-    if (Lpuart_Uart_Ip_GetTransmitStatus(LPUART_INSTANCE, &bytes_remaining) != LPUART_UART_IP_STATUS_SUCCESS) {
-        // Handle error (optional)
-    }
+	hal_uart_transmit_it(&lpuart6, msg, strlen(msg));
 }
