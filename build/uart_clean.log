@@ -1,0 +1,68 @@
+﻿
+K)
+[hse_cmac] keyInfo: type=0x12 bitLen=128 flags=0x000C
+[hse_cmac] >>> cmac_generate ch=1
+[hse_cmac] <<< cmac_generate rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC generate done, tagLen=16
+[hse_cmac] tag = 6A 0E 6D 87 C6 F9 0E 16 5D 05 8C 2C F9 06 15 E2
+[hse_cmac] trunc MAC matches mbedtls/provision reference (6A 0E 6D)
+[hse_cmac] full 16 B MAC matches provision capture
+[hse_cmac] >>> cmac_verify ch=1
+[hse_cmac] <<< cmac_verify rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC verify PASSED - NVM key provisioning confirmed
+[hse_cmac] --- provisioned-key CMAC check end ---
+Hello, this message is sent via UART!
+Starting CMAC computation (provisioned NVM key via mbedTLS)...
+Using provisioned NVM key handle=0x00010000
+[diag] raw HSE_Cmac() rsp=0x55A5AA33 tagLen=16
+Error: CMAC computation failed, ret=-122
+
+Boot from PFLASH: 0x00400000...
+
+S32K EasyBoot v2025.06 (Aug 20 2026 - 14:46:44 CEST)
+CPU:   ARM Cortex-M7 @120MHz (Single Core)
+Model: S32K312
+CPUID: 411FC272
+SRAM:  192 KiB
+Flash: pflash: 1920 KiB
+       dflash: 128 KiB
+In:    serial@LPUART6
+Out:   serial@LPUART6
+Err:   serial@LPUART6
+Net:   None
+HSE:   Disabled
+HSE FW: 0.13.0 / 2.55.0 (pb250129)
+## Loading App from pflash...
+App loaded successfully
+## Booting App from pflash at 0x00440000 ...
+   App Name:    MainApp
+   Built Time:  Aug 20 2026 14:34:31
+   App Type:    Raw Binary
+   App Ver:     v1.2.3
+   App Size:    1638400 Bytes = 1600 KiB
+   App Address: 0x00440000
+   App Point:   0x00440000
+   Verifying Checksum ... OK
+## Loading App from 0x00440000 ...
+
+Starting App ...
+
+
+[hse_cmac] --- provisioned-key CMAC check begin ---
+[hse_cmac] expect NVM keyHandle=0x00010000 (cat=NVM grp=0 slot=0)
+[hse_cmac] HSE status=0x0B20 INIT_OK=1 INSTALL_OK=1
+[hse_cmac] >>> get_key_info ch=1
+[hse_cmac] <<< get_key_info rsp=0x55A5AA33 (OK)
+[hse_cmac] keyInfo: type=0x12 bitLen=128 flags=0x000C
+[hse_cmac] >>> cmac_generate ch=1
+[hse_cmac] <<< cmac_generate rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC generate done, tagLen=16
+[hse_cmac] tag = 6A 0E 6D 87 C6 F9 0E 16 5D 05 8C 2C F9 06 15 E2
+[hse_cmac] trunc MAC matches mbedtls/provision reference (6A 0E 6D)
+[hse_cmac] full 16 B MAC matches provision capture
+[hse_cmac] >>> cmac_verify ch=1
+[hse_cmac] <<< cmac_verify rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC verify PASSED - NVM key provisioning confirmed
+[hse_cmac] --- provisioned-key CMAC check end ---
+Hello, this message is sent via UART!
+--- UART capture ended after 45221 ms ---

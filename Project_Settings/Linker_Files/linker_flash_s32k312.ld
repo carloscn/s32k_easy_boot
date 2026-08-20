@@ -57,10 +57,6 @@ MEMORY
     ram_rsvd2               : ORIGIN = 0x20418000, LENGTH = 0             /* End of SRAM */
 }
 
-TARGET(binary)
-INPUT (..\..\s32k_demo\Debug_FLASH\s32k_demo.bin)
-OUTPUT_FORMAT(default)
-
 SECTIONS
 {
     .pflash :
@@ -116,16 +112,16 @@ SECTIONS
     . = ALIGN(4);
     __text_end = .;
     __sram_data_rom = __text_end;
-    
-    .int_flash_app_0 :
-    {
-    	. = ALIGN(4);
-    	__int_flash_app_bin_0_start__ = .;
-    	..\..\s32k_demo\Debug_FLASH\s32k_demo.bin (.data)
-    	__int_flash_app_bin_0_end__ = .;
-    } > int_flash_app_0
-    
-    __int_flash_app_0_size = __int_flash_app_bin_0_end__ - __int_flash_app_bin_0_start__;
+
+    /* App is no longer embedded here at link time - it's flashed to
+     * int_flash_app_0 (0x00440000) completely independently, using
+     * s32k_demo's own linker script/build. easy_boot's boot.c never
+     * referenced the __int_flash_app_bin_0_*__ symbols this section used to
+     * define - it reads app_metadata_t from a fixed runtime address
+     * (APP_METADATA_ADDR, boot.h) instead, so decoupling this needed no
+     * boot.c changes. See AGENTS.md for why this used to be linked
+     * together (a real bug: Makefile had no dependency on the embedded
+     * .bin, so App changes silently didn't take effect on reflash). */
 
     .sram_bss (NOLOAD) :
     {

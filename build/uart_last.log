@@ -1,0 +1,14 @@
+K)
+[hse_cmac] keyInfo: type=0x12 bitLen=128 flags=0x000C
+[hse_cmac] >>> cmac_generate ch=1
+[hse_cmac] <<< cmac_generate rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC generate done, tagLen=16
+[hse_cmac] tag = 6A 0E 6D 87 C6 F9 0E 16 5D 05 8C 2C F9 06 15 E2
+[hse_cmac] trunc MAC matches mbedtls/provision reference (6A 0E 6D)
+[hse_cmac] full 16 B MAC matches provision capture
+[hse_cmac] >>> cmac_verify ch=1
+[hse_cmac] <<< cmac_verify rsp=0x55A5AA33 (OK)
+[hse_cmac] CMAC verify PASSED - NVM key provisioning confirmed
+[hse_cmac] --- provisioned-key CMAC check end ---
+Hello, this message is sent via UART!
+--- UART capture ended after 3088 ms ---

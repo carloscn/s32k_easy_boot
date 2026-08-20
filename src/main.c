@@ -46,6 +46,7 @@
 //#include "tja1153.h"
 #include "FlexCAN_Ip.h"
 #include "hal_uart.h"
+#include "hse_cmac_demo.h"
 
 
 
@@ -139,6 +140,7 @@ int main(void)
 	board_level_init();
 
 	boot_print_board_info();
+	hse_cmac_demo_run();
 	leds_ctrl_boot_led_blink();
     boot_app();
 

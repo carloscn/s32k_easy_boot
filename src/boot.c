@@ -11,6 +11,8 @@
 #include "osal_log.h"
 #include "boot.h"
 #include "boot_version.h"
+#include "build_timestamp.h"
+#include "hse_fw_version.h"
 
 // Board information structure
 typedef struct {
@@ -30,6 +32,7 @@ typedef struct {
     const char *serial_err;        // Error serial port (e.g., "serial@LPUART6")
     const char *network;           // Network interface (e.g., "None")
     const char *hse;
+    const char *hse_fw_version;    // Target HSE firmware version embedded in this build
     uint32_t load_address;         // Load address (e.g., 0x80007FC0)
     uint32_t entry_point;          // Entry point (e.g., 0x80007FC0)
     uint32_t app_address;          // App address (e.g., 0x83000000)
@@ -51,6 +54,7 @@ static const board_info_t board_info = {
     .serial_err = "serial@LPUART6",
     .network = "None",
 	.hse = "Disabled",
+	.hse_fw_version = HSE_FW_VERSION_STRING,
     .load_address = EASY_BOOT_START_ADDR,
     .entry_point = EASY_BOOT_START_ADDR,
     .app_address = APP_START_ADDRESS,
@@ -194,7 +198,10 @@ int32_t boot_print_board_info(void)
     char chip_id[9] = {0};
     char build_time_str[32];
 
-    snprintf(build_time_str, sizeof(build_time_str), "%s - %s", __DATE__, __TIME__);
+    /* Madrid (CET/CEST) build time, computed by tools/gen_build_timestamp.py -
+     * not __DATE__/__TIME__, which only reflect the build machine's own local
+     * clock/timezone with no timezone label. Re-run that script to refresh it. */
+    snprintf(build_time_str, sizeof(build_time_str), "%s", BUILD_TIMESTAMP_MADRID);
 
     if (boot_read_device_id(chip_id, sizeof(chip_id)) != 0) {
         snprintf(chip_id, sizeof(chip_id), "Unknown");
@@ -239,6 +246,9 @@ int32_t boot_print_board_info(void)
     osal_log_info(line_buf);
 
     snprintf(line_buf, sizeof(line_buf), "HSE:   %s\r\n", board_info.hse);
+    osal_log_info(line_buf);
+
+    snprintf(line_buf, sizeof(line_buf), "HSE FW: %s\r\n", board_info.hse_fw_version);
     osal_log_info(line_buf);
 
     // === Application Information ===

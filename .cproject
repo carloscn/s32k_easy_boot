@@ -39,6 +39,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include/&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/generate/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include/public_inc/&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/include/hse/&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/board&quot;"/>
 									<listOptionValue builtIn="false" value="${ProjDirPath}/RTD/include"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/generate/src&quot;"/>
@@ -987,7 +988,7 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="com.nxp.s32ds.cle.uct.core">
-		<sdkComponents>platform.driver.c40;platform.driver.clock;platform.driver.rte_mcu;platform.driver.det;platform.driver.osif;platform.driver.siul2_port;platform.driver.rte_port;platform.driver.siul2_dio;platform.driver.rte_dio;platform.driver.lpuart_uart;platform.driver.rte_uart;platform.driver.IntCtrl_Ip;platform.driver.cache;platform.driver.rte_mcl;platform.driver.c40_ip;platform.driver.rte_mem_43_infls;platform.driver.crc_ip;platform.driver.dma;platform.driver.FlexCAN;platform.driver.rte_can;platform.driver.pit;platform.driver.rte_gpt</sdkComponents>
+		<sdkComponents>platform.driver.c40;platform.driver.clock;platform.driver.rte_mcu;platform.driver.det;platform.driver.osif;platform.driver.siul2_port;platform.driver.rte_port;platform.driver.siul2_dio;platform.driver.rte_dio;platform.driver.lpuart_uart;platform.driver.rte_uart;platform.driver.IntCtrl_Ip;platform.driver.cache;platform.driver.rte_mcl;platform.driver.c40_ip;platform.driver.rte_mem_43_infls;platform.driver.crc_ip;platform.driver.dma;platform.driver.FlexCAN;platform.driver.rte_can;platform.driver.pit;platform.driver.rte_gpt;platform.driver.pins;platform.driver.Hse;platform.driver.rte_crypto</sdkComponents>
 	</storageModule>
 	<storageModule moduleId="com.nxp.s32ds.cle.uct.internal.core.toolchainSettings">
 		<COND_TOOLCHAIN_LIBRARIES/>
@@ -997,21 +998,21 @@
 		<COND_TOOLCHAIN_CUSTOM_OPTION/>
 	</storageModule>
 	<storageModule moduleId="com.nxp.s32ds.cle.uct.internal.core.toolchainScriptProfile">
-		<COND_TOOLCHAIN_COMPONENTS_OPTION>COPY=platform.driver.siul2_dio;platform.driver.crc_ip;platform.driver.pit;platform.driver.clock;platform.driver.osif;platform.driver.lpuart_uart;platform.driver.IntCtrl_Ip;platform.driver.FlexCAN;platform.driver.siul2_port;platform.driver.cache;platform.driver.dma;platform.driver.c40_ip</COND_TOOLCHAIN_COMPONENTS_OPTION>
+		<COND_TOOLCHAIN_COMPONENTS_OPTION>COPY=platform.driver.siul2_dio;platform.driver.pit;platform.driver.clock;platform.driver.osif;platform.driver.IntCtrl_Ip;platform.driver.FlexCAN;platform.driver.cache;platform.driver.crc_ip;platform.driver.lpuart_uart;platform.driver.siul2_port;platform.driver.dma;platform.driver.c40_ip;platform.driver.Hse</COND_TOOLCHAIN_COMPONENTS_OPTION>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.284701700;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.284701700.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.381312512;cdt.managedbuild.tool.gnu.c.compiler.input.548068671">
+		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.ram.2135597558;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.ram.2135597558.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.1801875165;cdt.managedbuild.tool.gnu.c.compiler.input.86260305">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.ram.2135597558;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.ram.2135597558.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.1801875165;cdt.managedbuild.tool.gnu.c.compiler.input.86260305">
+		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.ram.750217792;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.ram.750217792.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.1147178367;cdt.managedbuild.tool.gnu.c.compiler.input.1473138102">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.956419836;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.release.956419836.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.427145920;cdt.managedbuild.tool.gnu.c.compiler.input.1699353383">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.ram.750217792;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.ram.750217792.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.1147178367;cdt.managedbuild.tool.gnu.c.compiler.input.1473138102">
+		<scannerConfigBuildInfo instanceId="com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.284701700;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.10.2.exe.debug.284701700.;com.nxp.s32ds.cle.arm.mbs.arm32.bare.gnu.9.2.tool.c.compiler.381312512;cdt.managedbuild.tool.gnu.c.compiler.input.548068671">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>
