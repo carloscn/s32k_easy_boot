@@ -1,0 +1,13 @@
+{
+  "key_desc_cfg": {
+    "fmt_ver": "0x00000001"
+  },
+  "mnft_sig_cfg": {
+    "pubkey_hash_sch": "SHA256",
+    "mnft_sig_sch": "ECDSA_256_SHA256",
+    "mnft_prvkey": "../sec_boot_keys/lab_app_sign_priv.pem"
+  },
+  "img_dgst_cfg": {
+    "img_hash_sch": "SHA256"
+  }
+}

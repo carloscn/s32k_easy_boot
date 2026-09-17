@@ -15,4 +15,7 @@
  */
 void osal_log_info(const char *msg);
 
+/** 0 = mute (UART encoding owns LPUART6). Default 1. */
+void osal_log_set_enabled(int on);
+
 #endif /* OSAL_LOG_H_ */

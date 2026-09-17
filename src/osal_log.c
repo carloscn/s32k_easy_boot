@@ -3,8 +3,19 @@
 #include <string.h>
 
 extern HAL_UART lpuart6;
+
+static int s_log_enabled = 1;
+
+void osal_log_set_enabled(int on)
+{
+    s_log_enabled = (0 != on) ? 1 : 0;
+}
+
 void osal_log_info(const char *msg)
 {
+	if (0 == s_log_enabled) {
+		return;
+	}
 	if (NULL == msg || msg[0] == '\0') {
 		return;
 	}

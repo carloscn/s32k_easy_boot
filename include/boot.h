@@ -1,24 +1,14 @@
 #ifndef BOOT_H_
 #define BOOT_H_
 
-// Application start address (in flash)
-#define APP_START_ADDRESS 0x00440000U
-#define EASY_BOOT_START_ADDR 0x00400000U
-#define APP_METADATA_ADDR 0x005CFFF0U
-#define APP_METADATA_MAGIC 0xAABBCCDDU
-#define APP_NAME_MAX_LEN 16U
-#define APP_VERSION_MAX_LEN 12U
+#include <stddef.h>
+#include <stdint.h>
+#include "app_metadata.h"
+#include "sec_boot_layout.h"
 
-typedef struct
-{
-    uint32_t magic;                         // 0x00: Identifier
-    char     app_name[APP_NAME_MAX_LEN];    // 0x04: Null-terminated app name
-    char     version[APP_VERSION_MAX_LEN];  // 0x14: Null-terminated version
-    char    *build_timestamp;               // 0x24: Null-terminated build date and time string
-    uint32_t flash_start_addr;              // 0x28: App binary flash base address
-    uint32_t image_size;                    // 0x2C: Size in bytes for CRC coverage
-    uint32_t crc32;                         // 0x30: CRC32 over image (excluding metadata)
-} app_metadata_t;
+#define APP_START_ADDRESS     ((uint32_t)SEC_BOOT_SLOT_A_IMAGE_ADDR)
+#define EASY_BOOT_START_ADDR  0x00400000U
+
 /**
  * @brief Read the app version string from metadata.
  * @param[out] version_buffer Buffer to store the version string.
@@ -76,26 +66,21 @@ int32_t boot_read_device_id(char *id_buffer, size_t buf_size);
  */
 
 /**
- * @brief Start execution of the user application from flash.
- *
- * This function performs the necessary steps to safely jump from
- * the bootloader to the application code located at a fixed flash
- * address (APP_START_ADDRESS).
- *
- * Steps performed:
- * 1. Disable interrupts to avoid unexpected behavior during jump.
- * 2. Read and validate the application's initial stack pointer (MSP).
- * 3. Read the application reset vector (initial PC) from vector table.
- * 4. Disable and clear all NVIC interrupts.
- * 5. Set the SCB->VTOR register to point to the application's vector table.
- * 6. Set MSP and PSP to the application's initial stack pointer.
- * 7. Jump to the application's reset handler.
- *
- * If validation fails, the function will enter a failure loop with an LED indication.
- *
- * @note APP_START_ADDRESS must be defined elsewhere as the base address of the application in flash.
- * @note This function does not return on success.
+ * Cortex-M XIP jump: VTOR + MSP + Reset_Handler at vector_table.
+ * Does not return on success.
+ */
+void boot_jump_xip(uint32_t vector_table);
+
+/**
+ * Jump via signed slot (boot_verify_preferred). If no valid header exists and
+ * SECBOOT_LEGACY_APP_FALLBACK is 1, falls back to boot_app_legacy().
  */
 void boot_app(void);
+
+/**
+ * Unsigned jump to APP_START_ADDRESS (slot A image / vector table at 0x00442000).
+ * Used only while slot headers are not yet programmed.
+ */
+void boot_app_legacy(void);
 
 #endif /* BOOT_H_ */

@@ -1,48 +1,64 @@
 /**
  * @file hal_flash.c
- * @brief Hardware Abstraction Layer (HAL) implementation for flash memory operations
- *
- * @version 1.0.1
- * @date 2025-06-21
- *
- * @details
- * This source file implements the flash memory operations defined in hal_flash.h,
- * including initialization, read, write, erase, and resource deallocation. It uses
- * the NXP S32K3 C40_Ip driver for low-level flash operations. Error handling is based
- * on return values defined in hal_err.h, with specific flash error codes.
- *
- * @history
- *  - v1.0.0, 2025-06-21, Initial implementation based on NXP C40_Ip driver
- *  - v1.0.1, 2025-06-21, Updated to use specific flash error codes from hal_err.h
+ * @brief Flash HAL — C40_Ip. program() does not erase (UDS 0x36).
  */
-
 #include "C40_Ip.h"
 #include "hal_error.h"
 #include "hal_flash.h"
-/*******************************************************************************
- * Definitions
- ******************************************************************************/
 
-#define SECTOR_SIZE (8192u) /* Sector size for S32K312, adjust for other MCUs */
-#define MASTER_ID (0U) /* Master ID for C40_Ip operations */
+#include <string.h>
 
-/*******************************************************************************
- * Local Variables
- ******************************************************************************/
+#define SECTOR_SIZE (HAL_FLASH_SECTOR_SIZE)
+#define MASTER_ID (0U)
+#define HAL_DCACHE_LINE (32u)
+/* Cortex-M7 SCB: don't depend on S32_SCB member names. */
+#define SCB_DCCMVAC (*(volatile uint32_t *)0xE000EF68UL)
+#define SCB_DCIMVAC (*(volatile uint32_t *)0xE000EF5CUL)
 
-static bool is_initialized = false; /* Tracks flash module initialization state */
+static bool is_initialized = false;
 
-/*******************************************************************************
- * Public Functions
- ******************************************************************************/
+/* C40 DATA registers are filled by the CPU; keep a cache-line-aligned copy
+ * anyway so a future DMA path and D-cache invalidate of the destination
+ * stay in one place. Lives in .bss (cacheable SRAM), not DTCM. */
+static uint8_t s_prog_buf[HAL_FLASH_PROGRAM_MAX]
+    __attribute__((aligned(32)));
 
-/**
- * @brief Validates if an address range is within a flash block
- *
- * @param addr Start address of the range
- * @param size Size of the range in bytes
- * @return boolean TRUE if valid, FALSE otherwise
- */
+static void dcache_clean(const void *addr, uint32_t len)
+{
+    uint32_t p;
+    uint32_t end;
+
+    if ((NULL == addr) || (0U == len)) {
+        return;
+    }
+    p = (uint32_t)addr & ~(HAL_DCACHE_LINE - 1U);
+    end = (uint32_t)addr + len;
+    while (p < end) {
+        SCB_DCCMVAC = p;
+        p += HAL_DCACHE_LINE;
+    }
+    __asm volatile("dsb" ::: "memory");
+    __asm volatile("isb" ::: "memory");
+}
+
+static void dcache_invalidate(uint32_t addr, uint32_t len)
+{
+    uint32_t p;
+    uint32_t end;
+
+    if (0U == len) {
+        return;
+    }
+    p = addr & ~(HAL_DCACHE_LINE - 1U);
+    end = addr + len;
+    while (p < end) {
+        SCB_DCIMVAC = p;
+        p += HAL_DCACHE_LINE;
+    }
+    __asm volatile("dsb" ::: "memory");
+    __asm volatile("isb" ::: "memory");
+}
+
 static bool hal_flash_is_valid_address(uint32_t addr, uint32_t size)
 {
     uint32_t end_addr;
@@ -69,42 +85,36 @@ static bool hal_flash_is_valid_address(uint32_t addr, uint32_t size)
     return false;
 }
 
-/**
- * @brief Initializes the flash memory interface
- *
- * @return int32_t Returns HAL_ERR_SUCCESS on success, or HAL_ERR_FLASH_INIT_FAILED on failure
- */
+static int32_t unlock_sector(uint32_t addr)
+{
+    C40_Ip_VirtualSectorsType sector = C40_Ip_GetSectorNumberFromAddress(addr);
+    C40_Ip_StatusType status;
+
+    if (C40_Ip_GetLock(sector) == C40_IP_STATUS_SECTOR_PROTECTED) {
+        status = C40_Ip_ClearLock(sector, MASTER_ID);
+        if (status != C40_IP_STATUS_SUCCESS) {
+            return HAL_ERR_FLASH_SECTOR_PROTECTED;
+        }
+    }
+    return HAL_ERR_SUCCESS;
+}
+
 int32_t hal_flash_init(void)
 {
-	C40_Ip_StatusType status = C40_Ip_Init(&C40_Ip_InitCfg);
-	if (status != C40_IP_STATUS_SUCCESS) {
-		return HAL_ERR_FLASH_INIT_FAILED;
-	}
-	is_initialized = true;
+    C40_Ip_StatusType status = C40_Ip_Init(&C40_Ip_InitCfg);
+    if (status != C40_IP_STATUS_SUCCESS) {
+        return HAL_ERR_FLASH_INIT_FAILED;
+    }
+    is_initialized = true;
 
-	return HAL_ERR_SUCCESS;
+    return HAL_ERR_SUCCESS;
 }
 
-/**
- * @brief Frees resources associated with the flash memory interface
- */
 void hal_flash_free(void)
 {
-	is_initialized = false;
-	/* No deinitialization required for C40_Ip driver */
+    is_initialized = false;
 }
 
-/**
- * @brief Erases one or more sectors of the flash memory starting at the specified address
- *
- * @param addr The starting address in flash memory to begin erasing
- * @param num_sectors The number of sectors to erase
- * @return int32_t Returns HAL_ERR_SUCCESS on success, or one of:
- *                 - HAL_ERR_INVALID_PARAM for invalid inputs
- *                 - HAL_ERR_NOT_INITIALIZED if module is not initialized
- *                 - HAL_ERR_FLASH_SECTOR_PROTECTED if a sector cannot be unlocked
- *                 - HAL_ERR_FLASH_ERASE_FAILED for erase failures
- */
 int32_t hal_flash_erase_sector(uint32_t addr, uint32_t num_sectors)
 {
     if (num_sectors == 0u) {
@@ -112,7 +122,7 @@ int32_t hal_flash_erase_sector(uint32_t addr, uint32_t num_sectors)
     }
 
     if (is_initialized == false) {
-    	return HAL_ERR_NOT_INITIALIZED;
+        return HAL_ERR_NOT_INITIALIZED;
     }
 
     uint32_t size = num_sectors * SECTOR_SIZE;
@@ -143,23 +153,12 @@ int32_t hal_flash_erase_sector(uint32_t addr, uint32_t num_sectors)
         if (status != C40_IP_STATUS_SUCCESS) {
             return HAL_ERR_FLASH_ERASE_FAILED;
         }
+        dcache_invalidate((uint32_t)addr + (i * SECTOR_SIZE), SECTOR_SIZE);
     }
 
     return HAL_ERR_SUCCESS;
 }
 
-/**
- * @brief Writes data to the flash memory at the specified address
- *
- * @param addr The starting address in flash memory to write to
- * @param data Pointer to the data buffer to write
- * @param size The size in bytes of the data to write
- * @return int32_t Returns HAL_ERR_SUCCESS on success, or one of:
- *                 - HAL_ERR_INVALID_PARAM for invalid inputs
- *                 - HAL_ERR_NOT_INITIALIZED if module is not initialized
- *                 - HAL_ERR_FLASH_SECTOR_PROTECTED if a sector cannot be unlocked
- *                 - HAL_ERR_FLASH_WRITE_FAILED for write or verification failures
- */
 int32_t hal_flash_write(uint32_t addr, const uint8_t *data, uint32_t size)
 {
     if (data == NULL || !hal_flash_is_valid_address(addr, size)) {
@@ -167,10 +166,9 @@ int32_t hal_flash_write(uint32_t addr, const uint8_t *data, uint32_t size)
     }
 
     if (is_initialized == false) {
-    	return HAL_ERR_NOT_INITIALIZED;
+        return HAL_ERR_NOT_INITIALIZED;
     }
 
-    C40_Ip_StatusType status;
     C40_Ip_VirtualSectorsType start_sector = C40_Ip_GetSectorNumberFromAddress(addr);
     C40_Ip_VirtualSectorsType end_sector = C40_Ip_GetSectorNumberFromAddress(addr + size - 1u);
     uint32_t sector_count = (end_sector - start_sector) + 1u;
@@ -179,34 +177,63 @@ int32_t hal_flash_write(uint32_t addr, const uint8_t *data, uint32_t size)
         return HAL_ERR_FLASH_ERASE_FAILED;
     }
 
-    C40_Ip_MainInterfaceWrite(addr, size, data, MASTER_ID);
-    do {
-        status = C40_Ip_MainInterfaceWriteStatus();
-    } while (status == C40_IP_STATUS_BUSY);
+    return hal_flash_program(addr, data, size);
+}
 
-    if (status != C40_IP_STATUS_SUCCESS) {
-        return HAL_ERR_FLASH_WRITE_FAILED;
+int32_t hal_flash_program(uint32_t addr, const uint8_t *data, uint32_t size)
+{
+    C40_Ip_StatusType status;
+    int32_t rc;
+
+    if ((data == NULL) || (0u == size) || !hal_flash_is_valid_address(addr, size)) {
+        return HAL_ERR_INVALID_PARAM;
+    }
+    if (((addr % HAL_FLASH_PROGRAM_ALIGN) != 0U) ||
+        ((size % HAL_FLASH_PROGRAM_ALIGN) != 0U)) {
+        return HAL_ERR_INVALID_PARAM;
+    }
+    if (is_initialized == false) {
+        return HAL_ERR_NOT_INITIALIZED;
     }
 
-    status = C40_Ip_Compare(addr, size, data);
-    if (status != C40_IP_STATUS_SUCCESS) {
-        return HAL_ERR_FLASH_VERIFY_FAILED;
+    while (size > 0U) {
+        uint32_t off = addr & (HAL_FLASH_PROGRAM_MAX - 1U);
+        uint32_t chunk = HAL_FLASH_PROGRAM_MAX - off;
+
+        if (chunk > size) {
+            chunk = size;
+        }
+
+        rc = unlock_sector(addr);
+        if (HAL_ERR_SUCCESS != rc) {
+            return rc;
+        }
+
+        (void)memcpy(s_prog_buf, data, chunk);
+        dcache_clean(s_prog_buf, chunk);
+
+        status = C40_Ip_MainInterfaceWrite(addr, chunk, s_prog_buf, MASTER_ID);
+        if (status != C40_IP_STATUS_SUCCESS) {
+            return HAL_ERR_FLASH_WRITE_FAILED;
+        }
+        do {
+            status = C40_Ip_MainInterfaceWriteStatus();
+        } while (status == C40_IP_STATUS_BUSY);
+
+        if (status != C40_IP_STATUS_SUCCESS) {
+            return HAL_ERR_FLASH_WRITE_FAILED;
+        }
+
+        dcache_invalidate(addr, chunk);
+
+        addr += chunk;
+        data += chunk;
+        size -= chunk;
     }
 
     return HAL_ERR_SUCCESS;
 }
 
-/**
- * @brief Reads data from the flash memory at the specified address
- *
- * @param addr The starting address in flash memory to read from
- * @param data Pointer to the buffer where data will be stored
- * @param size The size in bytes of data to read
- * @return int32_t Returns HAL_ERR_SUCCESS on success, or one of:
- *                 - HAL_ERR_INVALID_PARAM for invalid inputs
- *                 - HAL_ERR_NOT_INITIALIZED if module is not initialized
- *                 - HAL_ERR_FLASH_READ_FAILED for read failures
- */
 int32_t hal_flash_read(uint32_t addr, uint8_t *data, uint32_t size)
 {
     if (data == NULL || !hal_flash_is_valid_address(addr, size)) {
@@ -214,7 +241,7 @@ int32_t hal_flash_read(uint32_t addr, uint8_t *data, uint32_t size)
     }
 
     if (is_initialized == false) {
-    	return HAL_ERR_NOT_INITIALIZED;
+        return HAL_ERR_NOT_INITIALIZED;
     }
 
     C40_Ip_StatusType status = C40_Ip_Read(addr, size, data);
@@ -224,9 +251,3 @@ int32_t hal_flash_read(uint32_t addr, uint8_t *data, uint32_t size)
 
     return HAL_ERR_SUCCESS;
 }
-
-
-
-/*******************************************************************************
- * EOF
- ******************************************************************************/

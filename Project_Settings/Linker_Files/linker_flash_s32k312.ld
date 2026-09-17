@@ -36,7 +36,7 @@
 * Last 176 KB of CODE_FLASH reserved by HSE Firmware
 * standby_data section should contain only uninitialized data
 */
-HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x00000200;
+HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x00004000;
 __STANDBY_RAM_LIMIT_END  = 0x20407FFF;  /* 32Kbyte for standby ram */
 
 ENTRY(Reset_Handler)
@@ -76,10 +76,12 @@ SECTIONS
         . = ALIGN(4);
         *(.text.startup)
         . = ALIGN(4);
-        *(.text)
-        *(.text*)
+        /* C40 + flash HAL wait loops must not execute from PFLASH Block 0
+         * while that block is being erased/programmed (idle slot A). */
+        *(EXCLUDE_FILE(*hal_flash.o) .text)
+        *(EXCLUDE_FILE(*hal_flash.o) .text*)
         . = ALIGN(4);
-        *(.mcal_text)
+        *(EXCLUDE_FILE(*C40_Ip.o) .mcal_text)
         . = ALIGN(4);
         *(.acmcu_code_rom)
         . = ALIGN(4);
@@ -127,6 +129,7 @@ SECTIONS
     {
         . = ALIGN(8);
         __standby_ram_begin__ = .;
+        KEEP(*(.boot_uds_magic))
         *(.standby_data)
         . = ALIGN(8);
         __standby_ram_end__ = .;
@@ -261,6 +264,8 @@ SECTIONS
     {
         . = ALIGN(4);
         __itcm_start__ = .;
+        *C40_Ip.o(.mcal_text)
+        *hal_flash.o(.text .text*)
         *(.itcm_text*)
         . = ALIGN(4);
         __itcm_end__ = .;

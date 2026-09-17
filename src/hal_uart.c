@@ -237,7 +237,11 @@ int32_t hal_uart_receive(HAL_UART *huart, uint8_t *data, size_t size, size_t tim
     /* poll until reception completes or timeout */
     while (Lpuart_Uart_Ip_GetReceiveStatus(huart->num, &bytes_remaining) == LPUART_UART_IP_STATUS_BUSY) {
         if (iteration_count++ >= max_iterations) {
-            tx_busy = false;
+            (void)Lpuart_Uart_Ip_AbortReceivingData(huart->num);
+            rx_busy = false;
+            rx_buffer = NULL;
+            rx_size = 0;
+            rx_count = 0;
             return HAL_ERR_TIMEOUT;
         }
     }

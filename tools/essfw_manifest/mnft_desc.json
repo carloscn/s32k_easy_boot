@@ -1,0 +1,26 @@
+{
+  "mnft_desc_cfg": {
+    "fmt_ver": "0x00000001",
+    "mnft_ver": "0x00000001",
+    "sec_boot": true
+  },
+  "imgs": [
+    {
+      "is_enc": false,
+      "slot": "a",
+      "static_addr": "0x00442000",
+      "load_addr": "0x00442000",
+      "entry": "0x00442000",
+      "path": "app.bin"
+    }
+  ],
+  "app_identity": {
+    "sw_version": "00.01.00",
+    "app_name": "FreeRTOSApp",
+    "product_family": "S32K312",
+    "part_number": "S32K312-EVB",
+    "hw_version": "REV-A",
+    "rxswin": "ESS-S32K-000001",
+    "anti_rollback": 1
+  }
+}

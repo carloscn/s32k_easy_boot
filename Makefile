@@ -11,7 +11,11 @@
 GCC_PATH      ?= C:/NXP/S32DS.3.5/S32DS/build_tools/gcc_v10.2/gcc-10.2-arm32-eabi/bin
 RTD_BASE_PATH ?= C:/NXP/S32DS.3.5/S32DS/software/PlatformSDK_S32K3/RTD
 
-SRC_DIRS     = src src/hse RTD/src board generate/src Project_Settings/Startup_Code
+# src/sec_boot/*.c only (boot_verify.c, boot_pubkey.c).
+# Single HAL/OSAL: existing include/hal_*.h + src/hal_*.c / osal_*.
+# No pal_*, no second Arm China HAL.
+SRC_DIRS     = src src/hse src/sec_boot \
+		  RTD/src board generate/src Project_Settings/Startup_Code
 PATH_BUILD   = build
 PATH_OBJS    = build/objects
 
@@ -20,11 +24,17 @@ AS      = $(GCC_PATH)/arm-none-eabi-gcc -x assembler-with-cpp -g3
 LD      = $(GCC_PATH)/arm-none-eabi-gcc
 SIZE    = $(GCC_PATH)/arm-none-eabi-size
 
-CFLAGS  = -std=c99 \
+CFLAGS  = -std=gnu11 \
 		  -DD_CACHE_ENABLE -DI_CACHE_ENABLE -DENABLE_FPU -DMPU_ENABLE -DGCC \
 		  -DS32K3XX -DS32K312 -DCPU_S32K312 -DCPU_CORTEX_M7 \
+		  -DUDS_TP_ISOTP_C=1 -DUDS_CUSTOM_MILLIS=1 -DUDS_ISOTP_MTU=512 \
+		  -DUDS_CONFIG_LOG_COLORS=0 \
+		  -DBOARD_S32K312EVB=1 \
+		  -DBOOT_UDS_L2_SKIP=1 \
+		  -DBOOT_UART_FLASH=1 \
 		  -IRTD/include \
 		  -Iinclude \
+		  -I../s32k312_freertos/external/iso14229 \
 		  -Iinclude/public_inc \
 		  -Iinclude/hse \
 		  -Igenerate/include \
@@ -57,6 +67,8 @@ LDFLAGS = -nostartfiles -Llib --entry=Reset_Handler -ggdb3 \
 		  -lc -lm -lgcc -l:libmbedcrypto.a
 
 SRCS    = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))
+# Pink image belongs in s32k312_provision, not Boot (256 KB int_pflash).
+SRCS   := $(filter-out src/hse/hse_fw_image.c,$(SRCS))
 SRCS_AS = $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.s))
 OBJS    = $(patsubst %.c,$(PATH_OBJS)/%.o,$(notdir $(SRCS))) $(patsubst %.s,$(PATH_OBJS)/%.o,$(notdir $(SRCS_AS)))
 
@@ -70,7 +82,7 @@ MKDIR = mkdir -p
 all: build_timestamp $(PATH_BUILD)/Easy_Boot.elf printsize
 
 build_timestamp:
-	python tools/gen_build_timestamp.py
+	-python tools/gen_build_timestamp.py
 
 $(PATH_BUILD) $(PATH_OBJS):
 	$(MKDIR) $@
@@ -84,6 +96,10 @@ $(PATH_BUILD) $(PATH_OBJS):
 # changes silently didn't take effect on reflash).
 $(PATH_BUILD)/Easy_Boot.elf: $(OBJS) Project_Settings/Linker_Files/linker_flash_s32k312.ld | $(PATH_BUILD)
 	$(LD) -o $@ $(OBJS) $(LDFLAGS)
+
+# iso14229 amalgamation is C11-ish and not -pedantic-clean.
+$(PATH_OBJS)/iso14229_amalg.o: iso14229_amalg.c | $(PATH_OBJS)
+	$(CC) $(filter-out -pedantic,$(CFLAGS)) -std=gnu11 $< -o $@
 
 $(PATH_OBJS)/%.o: %.c | $(PATH_OBJS)
 	$(CC) $(CFLAGS) $< -o $@
